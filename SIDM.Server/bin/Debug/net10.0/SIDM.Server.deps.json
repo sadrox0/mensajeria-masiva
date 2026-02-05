@@ -1,0 +1,79 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "SIDM.Server/1.0.0": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Authentication.Negotiate": "10.0.2"
+        },
+        "runtime": {
+          "SIDM.Server.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.Negotiate/10.0.2": {
+        "dependencies": {
+          "System.DirectoryServices.Protocols": "10.0.2"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Authentication.Negotiate.dll": {
+            "assemblyVersion": "10.0.2.0",
+            "fileVersion": "10.0.225.61305"
+          }
+        }
+      },
+      "System.DirectoryServices.Protocols/10.0.2": {
+        "runtime": {
+          "lib/net10.0/System.DirectoryServices.Protocols.dll": {
+            "assemblyVersion": "10.0.0.2",
+            "fileVersion": "10.0.225.61305"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux/lib/net10.0/System.DirectoryServices.Protocols.dll": {
+            "rid": "linux",
+            "assetType": "runtime",
+            "assemblyVersion": "10.0.0.2",
+            "fileVersion": "10.0.225.61305"
+          },
+          "runtimes/osx/lib/net10.0/System.DirectoryServices.Protocols.dll": {
+            "rid": "osx",
+            "assetType": "runtime",
+            "assemblyVersion": "10.0.0.2",
+            "fileVersion": "10.0.225.61305"
+          },
+          "runtimes/win/lib/net10.0/System.DirectoryServices.Protocols.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "10.0.0.2",
+            "fileVersion": "10.0.225.61305"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SIDM.Server/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.AspNetCore.Authentication.Negotiate/10.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2K0QYj3YYYZkQu0rPk3dUn2oCWGmrOdhtRd1poxIMXUOg2AUBg9/2cl2WZUUquIFrOxa6+R6lXux/w2ZqlgRSw==",
+      "path": "microsoft.aspnetcore.authentication.negotiate/10.0.2",
+      "hashPath": "microsoft.aspnetcore.authentication.negotiate.10.0.2.nupkg.sha512"
+    },
+    "System.DirectoryServices.Protocols/10.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-isY6uV3XcX57n+NG3PZcalNN4/YQNUTPcaKkvm927+oFRmCUkm7bf4oZZuBWdKjI/LGgQceWap3b15jg/XAVaA==",
+      "path": "system.directoryservices.protocols/10.0.2",
+      "hashPath": "system.directoryservices.protocols.10.0.2.nupkg.sha512"
+    }
+  }
+}
