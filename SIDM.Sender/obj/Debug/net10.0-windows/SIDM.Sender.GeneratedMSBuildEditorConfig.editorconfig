@@ -10,7 +10,11 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = SIDM.Sender
+<<<<<<< HEAD
 build_property.ProjectDir = C:\Users\saulm\source\repos\sadrox0\mensajeria-masiva\SIDM.Sender\
+=======
+build_property.ProjectDir = C:\Users\saulm\source\repos\mensajeria-masiva\SIDM.Sender\
+>>>>>>> 032944cb87d8c391610f8144bf9cc29fb52d4951
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false

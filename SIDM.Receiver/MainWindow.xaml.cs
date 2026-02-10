@@ -20,7 +20,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         _connection = new HubConnectionBuilder()
-            .WithUrl("http://10.1.0.145:5271/sidmHub")
+            .WithUrl("http://10.1.1.98:5271/sidmHub")
             .WithAutomaticReconnect()
             .Build();
 
