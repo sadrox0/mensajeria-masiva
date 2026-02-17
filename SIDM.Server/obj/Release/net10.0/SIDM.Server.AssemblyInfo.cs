@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SIDM.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+61c00845bab2940987634fafc704e12e2dea9387")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8ca9a4ef6a77a1e4401a45cfe21bc297a33c7573")]
 [assembly: System.Reflection.AssemblyProductAttribute("SIDM.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SIDM.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

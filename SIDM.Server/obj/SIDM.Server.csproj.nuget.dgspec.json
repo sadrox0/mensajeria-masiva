@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\geom2\\Desktop\\Proyecto_SIDM\\Proyecto_SIDM\\SIDM.Server\\SIDM.Server.csproj": {}
+    "C:\\Users\\geom2\\source\\repos\\sadrox0\\mensajeria-masiva\\SIDM.Server\\SIDM.Server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\geom2\\Desktop\\Proyecto_SIDM\\Proyecto_SIDM\\SIDM.Server\\SIDM.Server.csproj": {
+    "C:\\Users\\geom2\\source\\repos\\sadrox0\\mensajeria-masiva\\SIDM.Server\\SIDM.Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\geom2\\Desktop\\Proyecto_SIDM\\Proyecto_SIDM\\SIDM.Server\\SIDM.Server.csproj",
+        "projectUniqueName": "C:\\Users\\geom2\\source\\repos\\sadrox0\\mensajeria-masiva\\SIDM.Server\\SIDM.Server.csproj",
         "projectName": "SIDM.Server",
-        "projectPath": "C:\\Users\\geom2\\Desktop\\Proyecto_SIDM\\Proyecto_SIDM\\SIDM.Server\\SIDM.Server.csproj",
+        "projectPath": "C:\\Users\\geom2\\source\\repos\\sadrox0\\mensajeria-masiva\\SIDM.Server\\SIDM.Server.csproj",
         "packagesPath": "C:\\Users\\geom2\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\geom2\\Desktop\\Proyecto_SIDM\\Proyecto_SIDM\\SIDM.Server\\obj\\",
+        "outputPath": "C:\\Users\\geom2\\source\\repos\\sadrox0\\mensajeria-masiva\\SIDM.Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -78,7 +78,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

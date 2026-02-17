@@ -655,23 +655,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\saulm\\.nuget\\packages\\": {},
+    "C:\\Users\\geom2\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\saulm\\source\\repos\\mensajeria-masiva\\SIDM.Receiver\\SIDM.Receiver.csproj",
+      "projectUniqueName": "C:\\Users\\geom2\\source\\repos\\sadrox0\\mensajeria-masiva\\SIDM.Receiver\\SIDM.Receiver.csproj",
       "projectName": "SIDM.Receiver",
-      "projectPath": "C:\\Users\\saulm\\source\\repos\\mensajeria-masiva\\SIDM.Receiver\\SIDM.Receiver.csproj",
-      "packagesPath": "C:\\Users\\saulm\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\saulm\\source\\repos\\mensajeria-masiva\\SIDM.Receiver\\obj\\",
+      "projectPath": "C:\\Users\\geom2\\source\\repos\\sadrox0\\mensajeria-masiva\\SIDM.Receiver\\SIDM.Receiver.csproj",
+      "packagesPath": "C:\\Users\\geom2\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\geom2\\source\\repos\\sadrox0\\mensajeria-masiva\\SIDM.Receiver\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\saulm\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\geom2\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -728,7 +728,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
