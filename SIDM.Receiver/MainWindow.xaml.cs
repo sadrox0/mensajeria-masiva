@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Media;
+using System.IO;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace SIDM.Receiver
@@ -47,12 +49,25 @@ namespace SIDM.Receiver
         private void procesarNuevoMensaje(string message, string level)
         {
             Brush colorPrioridad = (SolidColorBrush?)new BrushConverter().ConvertFrom("#004581") ?? Brushes.Blue;
-            if (level.Contains("Emergencia")) colorPrioridad = Brushes.DarkRed;
-            else if (level.Contains("Urgente")) colorPrioridad = Brushes.DarkOrange;
+
+            // --- LÓGICA DE SONIDOS ---
+            if (level.Contains("Emergencia") || level.Contains("Urgente"))
+            {
+                colorPrioridad = level.Contains("Emergencia") ? Brushes.DarkRed : Brushes.DarkOrange;
+                SystemSounds.Exclamation.Play();
+            }
+            else
+            {
+                // REPRODUCIR TU SONIDO SINTÉTICO (Suave y corto)
+                ReproducirNotificacionSintetica();
+            }
+
+            // Marca de tiempo con mes en letra y año
+            string marcaTiempo = DateTime.Now.ToString("dd/MMM/yyyy HH:mm");
 
             HistorialMensajes.Insert(0, new MensajeItem
             {
-                Hora = DateTime.Now.ToString("HH:mm"),
+                Hora = marcaTiempo,
                 Texto = message,
                 PrioridadTexto = level.ToUpper(),
                 ColorPrioridad = colorPrioridad
@@ -72,10 +87,66 @@ namespace SIDM.Receiver
                 MostrarVentanaCompleta();
         }
 
-        private async void StartConnection()
+        // ====== TU GENERADOR DE SONIDO INTEGRADO ======
+        private void ReproducirNotificacionSintetica()
         {
-            try { await _connection.StartAsync(); } catch { }
+            try
+            {
+                using MemoryStream ms = GenerateNotificationSound();
+                SoundPlayer player = new SoundPlayer(ms);
+                player.Load();
+                player.Play(); // Usamos Play para no congelar la interfaz
+            }
+            catch { /* Silencio si algo falla */ }
         }
+
+        private MemoryStream GenerateNotificationSound()
+        {
+            int sampleRate = 44100;
+            double duration = 0.45;
+            int samples = (int)(sampleRate * duration);
+            int bytesPerSample = 2;
+
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
+
+            bw.Write(System.Text.Encoding.ASCII.GetBytes("RIFF"));
+            bw.Write(0);
+            bw.Write(System.Text.Encoding.ASCII.GetBytes("WAVE"));
+            bw.Write(System.Text.Encoding.ASCII.GetBytes("fmt "));
+            bw.Write(16);
+            bw.Write((short)1);
+            bw.Write((short)1);
+            bw.Write(sampleRate);
+            bw.Write(sampleRate * bytesPerSample);
+            bw.Write((short)bytesPerSample);
+            bw.Write((short)16);
+            bw.Write(System.Text.Encoding.ASCII.GetBytes("data"));
+            bw.Write(samples * bytesPerSample);
+
+            double twoPi = 2 * Math.PI;
+            double amp = 0.4 * short.MaxValue;
+
+            for (int n = 0; n < samples; n++)
+            {
+                double t = (double)n / sampleRate;
+                double freq = t < duration / 2 ? 880 : 1320;
+                double envelope = Math.Exp(-6 * t);
+                double sample = amp * envelope * (Math.Sin(twoPi * freq * t) + 0.2 * Math.Sin(twoPi * freq * 2 * t));
+                bw.Write((short)sample);
+            }
+
+            long fileSize = ms.Length;
+            ms.Seek(4, SeekOrigin.Begin);
+            bw.Write((int)(fileSize - 8));
+            ms.Seek(40, SeekOrigin.Begin);
+            bw.Write(samples * bytesPerSample);
+            ms.Position = 0;
+            return ms;
+        }
+
+        // ... (Resto de métodos de ventana y conexión intactos)
+        private async void StartConnection() { try { await _connection.StartAsync(); } catch { } }
 
         private void MostrarVentanaCompleta()
         {
@@ -84,15 +155,12 @@ namespace SIDM.Receiver
             GridAlerta.Visibility = Visibility.Visible;
             GridBurbuja.Visibility = Visibility.Collapsed;
             BadgeAlerta.Visibility = Visibility.Collapsed;
-
             this.Width = 600; this.Height = 600;
             this.Left = (SystemParameters.WorkArea.Width - 600) / 2;
             this.Top = (SystemParameters.WorkArea.Height - 600) / 2;
-
             MainBorder.Background = Brushes.White;
             MainBorder.BorderThickness = new Thickness(1.5);
-            this.Topmost = true;
-            this.Activate();
+            this.Topmost = true; this.Activate();
         }
 
         private void ActivarModoBurbuja()
