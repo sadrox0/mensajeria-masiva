@@ -1,61 +1,102 @@
-﻿
-using System;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows;
-using Microsoft.AspNetCore.SignalR.Client;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Media;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
 
-namespace SIDM.Sender;
-
-public partial class MainWindow : Window
+namespace SIDM.Sender
 {
-    private HubConnection _connection;
-
-    public MainWindow()
+    public class MensajeItem
     {
-        InitializeComponent();
-
-        // Conexión a la IP de tu servidor
-        _connection = new HubConnectionBuilder()
-            .WithUrl("http://10.1.0.145:5271/sidmHub")
-            .WithAutomaticReconnect()
-            .Build();
-
-        IniciarConexion();
+        public string Hora { get; set; } = string.Empty;
+        public string Texto { get; set; } = string.Empty;
+        public string PrioridadTexto { get; set; } = string.Empty;
+        public Brush ColorPrioridad { get; set; } = Brushes.Gray;
     }
 
-    private async void IniciarConexion()
+    public partial class MainWindow : Window
     {
-        try { await _connection.StartAsync(); }
-        catch { /* Reintento automático activo */ }
-    }
+        private HubConnection _connection;
+        private bool _historialAbierto = false;
+        public ObservableCollection<MensajeItem> HistorialEnviados { get; set; } = new ObservableCollection<MensajeItem>();
 
-    private async void Send_Click(object sender, RoutedEventArgs e)
-    {
-        // Validación de seguridad
-        if (string.IsNullOrWhiteSpace(txtInput.Text))
+        private readonly Brush _colorGuinda = (SolidColorBrush)new BrushConverter().ConvertFrom("#9F2241")!;
+        private readonly Brush _colorVerde = (SolidColorBrush)new BrushConverter().ConvertFrom("#229F80")!;
+        private readonly Brush _colorEmergencia = (SolidColorBrush)new BrushConverter().ConvertFrom("#8F0800")!;
+
+        public MainWindow()
         {
-            MessageBox.Show("Operación cancelada: El mensaje no puede estar vacío.", "Validación de Seguridad", MessageBoxButton.OK, MessageBoxImage.Stop);
-            return;
+            InitializeComponent();
+            lstHistorial.ItemsSource = HistorialEnviados;
+
+            _connection = new HubConnectionBuilder()
+                .WithUrl("http://10.1.1.98:5271/sidmHub")
+                .WithAutomaticReconnect()
+                .Build();
+
+            _connection.On<string, string>("ReceiveAlert", (message, level) => {
+                Dispatcher.Invoke(() => {
+                    Brush color = _colorGuinda;
+                    if (level.Contains("Informativo")) color = _colorVerde;
+                    if (level.Contains("Emergencia")) color = _colorEmergencia;
+
+                    HistorialEnviados.Insert(0, new MensajeItem
+                    {
+                        Hora = DateTime.Now.ToString("dd/MMM/yyyy HH:mm"),
+                        Texto = message,
+                        PrioridadTexto = level.ToUpper(),
+                        ColorPrioridad = color
+                    });
+
+                    if (HistorialEnviados.Count > 20) HistorialEnviados.RemoveAt(20);
+                });
+            });
+
+            IniciarConexion();
         }
 
-        if (_connection.State != HubConnectionState.Connected)
+        private async void IniciarConexion()
         {
-            MessageBox.Show("Error de enlace: No hay conexión con la base del 911.", "Fallo de Red");
-            return;
+            try { await _connection.StartAsync(); } catch { }
         }
 
-        string mensaje = txtInput.Text;
-        string nivel = (cbNivel.SelectedItem as System.Windows.Controls.ComboBoxItem).Content.ToString();
+        private async void Send_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtInput.Text)) return;
+            if (_connection.State != HubConnectionState.Connected) return;
 
-        try
-        {
-            await _connection.InvokeAsync("SendAlert", mensaje, nivel);
-            txtInput.Clear();
-            MessageBox.Show("Difusión enviada con éxito a todas las unidades de patrullaje.", "Confirmación de Mando");
+            string nivel = (cbNivel.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Informativo";
+            try
+            {
+                await _connection.InvokeAsync("SendAlert", txtInput.Text, nivel);
+
+                // Fix de sonido: SystemSounds es más confiable
+                if (nivel != "Informativo") SystemSounds.Hand.Play();
+                else SystemSounds.Asterisk.Play();
+
+                txtInput.Clear();
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
-        catch (Exception ex)
+
+        private void ToggleHistorial_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show($"Error crítico en el protocolo de envío: {ex.Message}");
+            if (!_historialAbierto)
+            {
+                ColHistorial.Width = new GridLength(480); // Espacio para tarjetas de 440 + scroll
+                _historialAbierto = true;
+            }
+            else
+            {
+                ColHistorial.Width = new GridLength(0);
+                _historialAbierto = false;
+            }
         }
+
+        private void BtnCerrar_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
+        private void HeaderBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) => this.DragMove();
     }
 }
