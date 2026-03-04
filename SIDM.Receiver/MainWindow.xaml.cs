@@ -25,6 +25,43 @@ namespace SIDM.Receiver
         private bool _esModoBurbuja = false;
         private double _ultimoLeftBurbuja = -1;
         private double _ultimoTopBurbuja = -1;
+        // Drag helpers for bubble to allow moving above screen edges
+        private bool _isDraggingBubble = false;
+        private System.Windows.Point _dragStartScreenPoint;
+        private double _dragStartLeft;
+        private double _dragStartTop;
+        // Pointer offset (screen coordinates) to avoid leading the bubble during drag
+        private double _pointerOffsetX;
+        private double _pointerOffsetY;
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct POINT {
+            public int X;
+            public int Y;
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out POINT lpPoint);
+
+        // Obtiene la posición del cursor en unidades WPF (DIPs), corrigiendo DPI
+        private Point GetCursorPositionInDips()
+        {
+            if (GetCursorPos(out POINT p))
+            {
+                var screenPoint = new Point(p.X, p.Y);
+                var source = PresentationSource.FromVisual(this);
+                if (source != null)
+                {
+                    var transform = source.CompositionTarget.TransformFromDevice;
+                    return transform.Transform(screenPoint);
+                }
+                return screenPoint;
+            }
+            // Fallback: use WPF mouse position relative to window and convert to screen
+            var rel = Mouse.GetPosition(this);
+            var screen = this.PointToScreen(rel);
+            return screen;
+        }
         public ObservableCollection<MensajeItem> HistorialMensajes { get; set; } = new ObservableCollection<MensajeItem>();
 
         // Colores institucionales definidos para el proyecto SIDM
@@ -39,7 +76,7 @@ namespace SIDM.Receiver
 
             // Configuración de SignalR para recibir alertas en tiempo real
             _connection = new HubConnectionBuilder()
-                .WithUrl("http://10.1.1.98:5271/sidmHub")
+                .WithUrl("http://192.168.137.22:5271/sidmHub")
                 .WithAutomaticReconnect()
                 .Build();
 
@@ -49,9 +86,10 @@ namespace SIDM.Receiver
 
             StartConnection();
 
-            // Ubicación inicial de la burbuja
+            // Ubicación inicial de la burbuja (ajustada para no salirse de la pantalla)
             _ultimoLeftBurbuja = SystemParameters.WorkArea.Width - 160;
             _ultimoTopBurbuja = SystemParameters.WorkArea.Height - 160;
+            // Ubicación inicial de la burbuja sin límite (se mantiene comportamiento original)
         }
 
         private void procesarNuevoMensaje(string message, string level)
@@ -137,10 +175,48 @@ namespace SIDM.Receiver
             this.Left = cLeft - 150;
             this.Top = cTop - 75;
 
+            // Asegurar que la ventana completa no se salga del área de trabajo
+            double newLeft = this.Left;
+            double newTop = this.Top;
+            var clipped = ClampToWorkAreaAndDetect(ref newLeft, ref newTop, this.Width, this.Height);
+            this.Left = newLeft;
+            this.Top = newTop;
+
             MainBorder.Background = Brushes.White;
             MainBorder.BorderThickness = new Thickness(1.5);
             this.Topmost = true;
             this.Activate();
+        }
+
+        // Asegura que una posición (left, top) con un tamaño dado quede dentro del área
+        // de trabajo del sistema para que la burbuja/window no sobresalga de la pantalla.
+        // Además detecta y devuelve qué bordes habrían quedado fuera antes de ajustar.
+        private (bool left, bool top, bool right, bool bottom) ClampToWorkAreaAndDetect(ref double left, ref double top, double width, double height)
+        {
+            var wa = SystemParameters.WorkArea;
+            bool clippedLeft = left < wa.Left;
+            bool clippedTop = top < wa.Top;
+            bool clippedRight = left + width > wa.Right;
+            bool clippedBottom = top + height > wa.Bottom;
+
+            // Ajuste para mantener dentro
+            if (clippedLeft) left = wa.Left;
+            if (clippedTop) top = wa.Top;
+            if (clippedRight) left = wa.Right - width;
+            if (clippedBottom) top = wa.Bottom - height;
+
+            // Log de los bordes recortados para diagnóstico
+            if (clippedLeft || clippedTop || clippedRight || clippedBottom)
+            {
+                string edges = string.Empty;
+                if (clippedLeft) edges += "Left ";
+                if (clippedTop) edges += "Top ";
+                if (clippedRight) edges += "Right ";
+                if (clippedBottom) edges += "Bottom ";
+                Console.WriteLine($"[Clamp] Se recortaron los bordes: {edges.Trim()}");
+            }
+
+            return (clippedLeft, clippedTop, clippedRight, clippedBottom);
         }
 
         private void ActivarModoBurbuja()
@@ -155,7 +231,9 @@ namespace SIDM.Receiver
             GridBurbuja.Visibility = Visibility.Visible;
 
             this.Width = 200; this.Height = 250;
+            // Aplicar la posición guardada tal como está (sin limitar) para la burbuja
             this.Left = _ultimoLeftBurbuja; this.Top = _ultimoTopBurbuja;
+            // Opcional: manejar visualmente si fue recortada alguna arista (logging ya realizado)
 
             MainBorder.Background = Brushes.Transparent;
             MainBorder.BorderThickness = new Thickness(0);
@@ -180,10 +258,43 @@ namespace SIDM.Receiver
             }
             else if (e.LeftButton == MouseButtonState.Pressed)
             {
-                this.DragMove();
+                // Inicio de arrastre manual para permitir mover la burbuja incluso más arriba del área de trabajo
+                _isDraggingBubble = true;
+                // Obtener posición del cursor en DIPs (corrige DPI) y calcular offset respecto a la esquina superior izquierda de la ventana
+                var cursorDip = GetCursorPositionInDips();
+                _pointerOffsetX = cursorDip.X - this.Left;
+                _pointerOffsetY = cursorDip.Y - this.Top;
+                // Capturar el ratón y suscribirse a eventos de movimiento/soltar
+                GridBurbuja.CaptureMouse();
+                this.MouseMove += Window_MouseMove_ForBubble;
+                this.PreviewMouseLeftButtonUp += Window_MouseLeftButtonUp_ForBubble;
+                // Guardar posición inicial
                 _ultimoLeftBurbuja = this.Left;
                 _ultimoTopBurbuja = this.Top;
             }
+        }
+
+        private void Window_MouseMove_ForBubble(object? sender, MouseEventArgs e)
+        {
+            if (!_isDraggingBubble) return;
+            // Obtener posición actual del cursor en DIPs y mover la ventana de modo que el cursor mantenga el mismo offset
+            var cur = GetCursorPositionInDips();
+            this.Left = cur.X - _pointerOffsetX;
+            this.Top = cur.Y - _pointerOffsetY;
+
+            // Actualizar posición guardada de la burbuja
+            _ultimoLeftBurbuja = this.Left;
+            _ultimoTopBurbuja = this.Top;
+        }
+
+        private void Window_MouseLeftButtonUp_ForBubble(object? sender, MouseButtonEventArgs e)
+        {
+            if (!_isDraggingBubble) return;
+            _isDraggingBubble = false;
+            try { GridBurbuja.ReleaseMouseCapture(); } catch { }
+            // Quitar listeners
+            this.MouseMove -= Window_MouseMove_ForBubble;
+            this.PreviewMouseLeftButtonUp -= Window_MouseLeftButtonUp_ForBubble;
         }
 
         private void ReproducirNotificacionSintetica()

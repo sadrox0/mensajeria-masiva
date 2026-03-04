@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SIDM.Sender")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a3c3d6dac46e19aaeab4ede2491ad09d6ef82bce")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+25b22f5d7f07d7358023018876cea9a27d1ab8af")]
 [assembly: System.Reflection.AssemblyProductAttribute("SIDM.Sender")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SIDM.Sender")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
