@@ -55,6 +55,23 @@ namespace SIDM.Sender
                 });
             });
 
+            // Cuando una estación confirma lectura (ACK), actualizamos el historial con una tarjeta "VISTO"
+            _connection.On<string, string>("UpdateStatusHistorial", (estacion, hora) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    HistorialEnviados.Insert(0, new MensajeItem
+                    {
+                        Hora = hora,
+                        PrioridadTexto = "VISTO",
+                        Texto = $"La estación [{estacion}] confirmó de recibido.",
+                        ColorPrioridad = _colorVerde
+                    });
+
+                    if (HistorialEnviados.Count > 50) HistorialEnviados.RemoveAt(50);
+                });
+            });
+
             IniciarConexion();
         }
 

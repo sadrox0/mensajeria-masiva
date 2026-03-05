@@ -18,4 +18,13 @@ public class AlertHub : Hub
         Console.WriteLine($"[ACK] Mensaje recibido por un cliente.");
         return Task.CompletedTask;
     }
+
+    // Notificar que una estación leyó el mensaje (ACK)
+    public async Task NotificarLectura(string estacion)
+    {
+        var hora = DateTime.Now.ToString("HH:mm:ss");
+        // Avisamos a todos los Senders que la estación 'X' ya lo leyó
+        await Clients.All.SendAsync("UpdateStatusHistorial", estacion, hora);
+        Console.WriteLine($"[ACK] Mensaje leído por: {estacion}");
+    }
 }

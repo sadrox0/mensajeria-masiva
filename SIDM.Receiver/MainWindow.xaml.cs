@@ -76,7 +76,7 @@ namespace SIDM.Receiver
 
             // Configuración de SignalR para recibir alertas en tiempo real
             _connection = new HubConnectionBuilder()
-                .WithUrl("http://192.168.137.22:5271/sidmHub")
+                .WithUrl("http://10.1.1.98:5271/sidmHub")
                 .WithAutomaticReconnect()
                 .Build();
 
@@ -247,7 +247,20 @@ namespace SIDM.Receiver
         }
 
         private void BtnMinimizar_Click(object sender, RoutedEventArgs e) => ActivarModoBurbuja();
-        private void BtnOk_Click(object sender, RoutedEventArgs e) => ActivarModoBurbuja();
+        private async void BtnOk_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_connection != null && _connection.State == HubConnectionState.Connected)
+                {
+                    // Enviamos el nombre de la máquina que confirma la lectura
+                    await _connection.InvokeAsync("NotificarLectura", Environment.MachineName);
+                }
+            }
+            catch { }
+
+            ActivarModoBurbuja();
+        }
 
         private void GridBurbuja_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

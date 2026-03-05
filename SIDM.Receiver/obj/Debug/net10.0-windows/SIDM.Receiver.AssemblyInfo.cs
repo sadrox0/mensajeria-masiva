@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SIDM.Receiver")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+25b22f5d7f07d7358023018876cea9a27d1ab8af")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f10bf56fbdb7db83dd1c6588a9f52397d1e8132d")]
 [assembly: System.Reflection.AssemblyProductAttribute("SIDM.Receiver")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SIDM.Receiver")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
